@@ -1,7 +1,16 @@
 # =========================
 # Unity
 # =========================
+./gitignore
 
+.utmp/
+/Primera-Game-Jam-MD/[Ll]ibrary/
+/Primera-Game-Jam-MD/[Tt]emp/
+/Primera-Game-Jam-MD/[Oo]bj/
+/Primera-Game-Jam-MD/[Bb]uild/
+/Primera-Game-Jam-MD/[Bb]uilds/
+/Primera-Game-Jam-MD/[Ll]ogs/
+/Primera-Game-Jam-MD/[Uu]ser[Ss]ettings/
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/

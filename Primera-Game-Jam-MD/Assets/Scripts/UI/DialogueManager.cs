@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,6 +11,10 @@ public class DialogueManager : MonoBehaviour
     [Header("References")]
     public GameObject dialogue;
     public GameObject flameBackground;
+    [Header("Teleport")]
+    public Transform teleportTarget;
+    public Transform teleportTargetCamera;
+    public CinemachineVirtualCamera vcam;
 
     [Header("Dialogue")]
     public TextMeshProUGUI dialogueText;
@@ -21,7 +26,8 @@ public class DialogueManager : MonoBehaviour
     private int index;
     private bool isTyping;
     private Coroutine typingCoroutine;
-    private PlayerController playerController;
+    private GameObject player;
+
 
     public System.Action OnDialogueFinished;
     void Awake()
@@ -37,14 +43,14 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
         dialogue.SetActive(false);
 
-        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()
     {
         if (!dialogue.activeSelf) return;
         flameBackground.SetActive(false);
-        playerController.canMove = false;
+        player.GetComponent<PlayerController>().canMove = false;
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -87,9 +93,14 @@ public class DialogueManager : MonoBehaviour
     public void EndDialogue()
     {
         dialogueText.text = "";
-
         flameBackground.SetActive(true);
-        playerController.canMove = true;
+        player.GetComponent<PlayerController>().canMove = true;
+
+        if (dialogue.activeSelf)
+        {
+            TeleportPlayer();
+        }
+        dialogue.SetActive(false);
 
         OnDialogueFinished?.Invoke();
         OnDialogueFinished = null;
@@ -103,7 +114,20 @@ public class DialogueManager : MonoBehaviour
 
         typingCoroutine = StartCoroutine(TypeLine(lines[index]));
     }
+    void TeleportPlayer()
+    {
+        CharacterController cc = player.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
 
+        player.transform.position = teleportTarget.position;
+        player.transform.rotation = teleportTarget.rotation;
+
+        if (cc != null) cc.enabled = true;
+
+        CameraFollowZOnly cam = vcam.GetComponent<CameraFollowZOnly>();
+        if (cam != null && teleportTargetCamera != null)
+            cam.SnapToPosition(teleportTargetCamera);
+    }
     IEnumerator TypeLine(string line)
     {
         isTyping = true;
@@ -117,5 +141,4 @@ public class DialogueManager : MonoBehaviour
 
         isTyping = false;
     }
-
 }

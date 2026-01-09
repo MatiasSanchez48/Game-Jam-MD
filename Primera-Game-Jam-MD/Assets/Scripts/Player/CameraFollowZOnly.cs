@@ -32,4 +32,15 @@ public class CameraFollowZOnly : MonoBehaviour
             followSpeed * Time.deltaTime
         );
     }
+
+    public void SnapToPosition(Transform newPosition)
+    {
+        transform.position = newPosition.position;
+
+        fixedX = newPosition.position.x;
+        fixedY = newPosition.position.y;
+        offsetZ = newPosition.position.z - target.position.z;
+
+        transform.rotation = newPosition.rotation;
+    }
 }

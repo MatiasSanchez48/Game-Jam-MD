@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MenuPause : MonoBehaviour
 {
@@ -30,17 +27,22 @@ public class MenuPause : MonoBehaviour
     public void LoadMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        ScreenFader.Instance.FadeToScene("MainMenu");
     }
-    public void NextLevel()
+    public void NextLevel(string level)
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (ScreenFader.Instance == null)
+        {
+            Debug.LogError("No hay ScreenFader en la escena");
+            return;
+        }
+        ScreenFader.Instance.FadeToScene(level);
     }
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        ScreenFader.Instance.FadeToScene("Matu");
 
         menuPause.SetActive(false);
         flameBackground.SetActive(true);

@@ -1,4 +1,4 @@
-using Cinemachine;
+﻿using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -11,10 +11,16 @@ public class DialogueManager : MonoBehaviour
     [Header("References")]
     public GameObject dialogue;
     public GameObject flameBackground;
+    public GameObject npcDialogue;
+
     [Header("Teleport")]
     public Transform teleportTarget;
     public Transform teleportTargetCamera;
-    public CinemachineVirtualCamera vcam;
+
+    [Header("Cinemachine")]
+    public Transform targetCameraNPC;
+    public CinemachineVirtualCamera vcamGameplay;
+    public CinemachineVirtualCamera vcamDialogue;
 
     [Header("Dialogue")]
     public TextMeshProUGUI dialogueText;
@@ -87,6 +93,13 @@ public class DialogueManager : MonoBehaviour
         index = 0;
         dialogueText.text = "";
         dialogue.SetActive(true);
+        //switch a camara cinemática
+        vcamGameplay.Priority = 0;
+        vcamDialogue.Priority = 10;
+        npcDialogue.SetActive(true);
+
+        StartCoroutine(DialogueCameraIntro(targetCameraNPC));
+
         StartTyping();
     }
 
@@ -95,6 +108,10 @@ public class DialogueManager : MonoBehaviour
         dialogueText.text = "";
         flameBackground.SetActive(true);
         player.GetComponent<PlayerController>().canMove = true;
+
+        //volver a gameplay camaras
+        vcamDialogue.Priority = 0;
+        vcamGameplay.Priority = 10;
 
         if (dialogue.activeSelf)
         {
@@ -124,7 +141,7 @@ public class DialogueManager : MonoBehaviour
 
         if (cc != null) cc.enabled = true;
 
-        CameraFollowZOnly cam = vcam.GetComponent<CameraFollowZOnly>();
+        CameraFollowZOnly cam = vcamGameplay.GetComponent<CameraFollowZOnly>();
         if (cam != null && teleportTargetCamera != null)
             cam.SnapToPosition(teleportTargetCamera);
     }
@@ -140,5 +157,23 @@ public class DialogueManager : MonoBehaviour
         }
 
         isTyping = false;
+    }
+    IEnumerator DialogueCameraIntro(Transform cameraTarget)
+    {
+
+        Vector3 startPos = vcamDialogue.transform.position;
+        Quaternion startRot = vcamDialogue.transform.rotation;
+
+        Vector3 endPos = cameraTarget.position;
+        Quaternion endRot = cameraTarget.rotation;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime;
+            vcamDialogue.transform.position = Vector3.Lerp(startPos, endPos, t);
+            vcamDialogue.transform.rotation = Quaternion.Slerp(startRot, endRot, t);
+            yield return null;
+        }
     }
 }
